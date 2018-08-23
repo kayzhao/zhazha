@@ -5,22 +5,24 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 @Entity
-public class Attendance {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Integer id;
-
-    @Version
+public class UnClock {
     private String dept;
-
     private String name;
     private String duty;
     private String reason;
     private Date date;
     private String type;
 
-    public void setId(Integer id) {
-        this.id = id;
+    public UnClock() {
+    }
+
+    public UnClock(String dept, String name, String duty, String reason, Date date, String type) {
+        this.dept = dept;
+        this.name = name;
+        this.duty = duty;
+        this.reason = reason;
+        this.date = date;
+        this.type = type;
     }
 
     public void setDept(String dept) {
@@ -45,10 +47,6 @@ public class Attendance {
 
     public void setType(String type) {
         this.type = type;
-    }
-
-    public Integer getId() {
-        return id;
     }
 
     public String getDept() {

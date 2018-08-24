@@ -1,10 +1,11 @@
 package cn.kay.zhazha.domain;
 
+import org.springframework.context.annotation.Bean;
+
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.Date;
 
-@Entity
 public class UnClock {
     private String dept;
     private String name;

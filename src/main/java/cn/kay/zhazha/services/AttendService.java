@@ -2,7 +2,8 @@ package cn.kay.zhazha.services;
 
 
 import java.io.File;
+import java.io.InputStream;
 
 public interface AttendService {
-    public void processExcel(File f1, File f2);
+    public File processExcel(InputStream f1, InputStream f2) throws Exception;
 }

@@ -5,9 +5,13 @@ import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.junit.Test;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.Resource;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -19,11 +23,10 @@ import java.util.*;
  */
 public class ExcelUtils {
     // 读取到列表
-    @Test
-    public Map readUnAttendanceExcel(File file) throws Exception {
-        List<UnClock> list = new ArrayList<UnClock>();
+
+    public static Map readUnClockExcel(InputStream file) throws Exception {
         // 读取 excel 文件，获得excel 文档对象
-        HSSFWorkbook book = new HSSFWorkbook(new FileInputStream(file));
+        HSSFWorkbook book = new HSSFWorkbook(file);
         Map<String, UnClock> map = new HashMap<>();
         // 获取到第一个表格
         HSSFSheet sheet = book.getSheetAt(0);
@@ -45,6 +48,12 @@ public class ExcelUtils {
             map.put(key, attendance);
         }
         return map;
+    }
+
+    public static File multipartToFile(MultipartFile multipart) throws IllegalStateException, IOException {
+        File convFile = new File("classpath:" + System.currentTimeMillis() + "");
+        multipart.transferTo(convFile);
+        return convFile;
     }
 
     /**
@@ -74,7 +83,7 @@ public class ExcelUtils {
         ExcelUtil.getInstance().exportObj2ExcelByTemplate(map, "classpath:web-info-template.xls",
                 new FileOutputStream("D:/out22.xls"), list, WebDto.class, true);
     }*/
-    private Date getDate(String date) throws Exception {
+    private static Date getDate(String date) throws Exception {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-mm-dd");
         return sdf.parse(date);
     }

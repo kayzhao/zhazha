@@ -1,15 +1,20 @@
 package cn.kay.zhazha.services;
 
-
-import org.springframework.context.annotation.Configuration;
+import cn.kay.zhazha.domain.UnClock;
+import cn.kay.zhazha.utils.ExcelUtils;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
+import java.io.InputStream;
+import java.util.Map;
 
-@Configuration
+@Component
 public class AttendServiceImpl implements AttendService {
 
     @Override
-    public void processExcel(File f1, File f2) {
-
+    public File processExcel(InputStream f1, InputStream f2) throws Exception {
+        Map<String, UnClock> unClockMap = ExcelUtils.readUnClockExcel(f1);
+        System.out.println(unClockMap.size());
+        return null;
     }
 }

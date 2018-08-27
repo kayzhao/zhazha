@@ -8,11 +8,10 @@ import java.util.Date;
 @AllArgsConstructor
 @Getter
 @Setter
-public class UnClock {
+public class UnClockHtml {
+    private String id;
     private String dept;
     private String name;
-    private String duty;
-    private String reason;
-    private Date date;
+    private Date time;
     private String type;
 }

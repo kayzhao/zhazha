@@ -36,4 +36,24 @@ public class AttendanceController {
         model.addAttribute("result", result);
         return "result";
     }
+
+    @GetMapping("/unclockhtml")
+    String indexHtml() {
+        return "unclockhtml";
+    }
+
+
+    @PostMapping(value = "/unclockhtml")
+    public String processHtml(Model model,
+                              @RequestParam MultipartFile unclockExcel,
+                              @RequestParam MultipartFile attendExcel) throws Exception {
+        /*model.addAttribute("products", productService.listAllProducts());*/
+        if (unclockExcel == null || attendExcel == null || unclockExcel.isEmpty() || attendExcel.isEmpty()) {
+            model.addAttribute("errorInfo", "未上传打卡表或者考勤表");
+            return "unclock";
+        }
+        File result = attendService.processExcel(unclockExcel.getInputStream(), attendExcel.getInputStream());
+        model.addAttribute("result", result);
+        return "result";
+    }
 }

@@ -17,7 +17,7 @@ public class AttendanceController {
     @Autowired
     private AttendService attendService;
 
-    @RequestMapping("/unclock")
+    @GetMapping("/unclock")
     String index() {
         return "unclock";
     }
@@ -30,7 +30,7 @@ public class AttendanceController {
         /*model.addAttribute("products", productService.listAllProducts());*/
         if (unclockExcel == null || attendExcel == null || unclockExcel.isEmpty() || attendExcel.isEmpty()) {
             model.addAttribute("errorInfo", "未上传打卡表或者考勤表");
-            return "index";
+            return "unclock";
         }
         File result = attendService.processExcel(unclockExcel.getInputStream(), attendExcel.getInputStream());
         model.addAttribute("result", result);

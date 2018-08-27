@@ -5,7 +5,8 @@ git pull
 
 echo stop application...
 
-PID=$(ps -ef | grep wifetool.jar | grep -v grep | awk '{ print $2 }')
+JAR_FILE = "wifetool-0.0.1.jar"
+PID=$(ps -ef | grep ${JAR_FILE} | grep -v grep | awk '{ print $2 }')
 if [ -z "$PID" ]
 then
     echo application is already stopped.
@@ -20,4 +21,4 @@ mvn clean install -DskipTests
 
 echo start application...
 cd target
-nohup java -jar wifetool.jar &
+nohup java -jar ${JAR_FILE} &

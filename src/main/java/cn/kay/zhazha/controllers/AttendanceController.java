@@ -17,7 +17,13 @@ public class AttendanceController {
     @Autowired
     private AttendService attendService;
 
-    @PostMapping(value = "/attend")
+    @RequestMapping("/unclock")
+    String index() {
+        return "unclock";
+    }
+
+
+    @PostMapping(value = "/unclock")
     public String process(Model model,
                           @RequestParam MultipartFile unclockExcel,
                           @RequestParam MultipartFile attendExcel) throws Exception {

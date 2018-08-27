@@ -19,5 +19,5 @@ echo package application...
 mvn clean install -DskipTests
 
 echo start application...
-cd zhazha/target
+cd target
 nohup java -jar wifetool.jar &

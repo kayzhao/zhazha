@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.util.Calendar;
+import java.util.Date;
 
 @Controller
 public class AttendanceController {
@@ -26,24 +28,30 @@ public class AttendanceController {
     @PostMapping(value = "/unclock")
     public String process(Model model,
                           @RequestParam MultipartFile unclockExcel,
-                          @RequestParam MultipartFile attendExcel) throws Exception {
+                          @RequestParam MultipartFile attendExcel,
+                          @RequestParam Integer year, @RequestParam Integer month) throws Exception {
         /*model.addAttribute("products", productService.listAllProducts());*/
         if (unclockExcel == null || attendExcel == null || unclockExcel.isEmpty() || attendExcel.isEmpty()) {
             model.addAttribute("errorInfo", "未上传打卡表或者考勤表");
             return "unclock";
         }
-        File result = attendService.processExcel(unclockExcel.getInputStream(), attendExcel.getInputStream());
+        Calendar calendar = Calendar.getInstance();
+        if (year == null)
+            year = Calendar.YEAR;
+        if (month == null)
+            month = Calendar.MONTH;
+        File result = attendService.processExcel(unclockExcel.getInputStream(), attendExcel.getInputStream(), year, month);
         model.addAttribute("result", result);
         return "result";
     }
 
-    @GetMapping("/unclockhtml")
+    @GetMapping("/fingerprint")
     String indexHtml() {
-        return "unclockhtml";
+        return "fingerprint";
     }
 
 
-    @PostMapping(value = "/unclockhtml")
+    @PostMapping(value = "/fingerprint")
     public String processHtml(Model model,
                               @RequestParam MultipartFile unclockExcel,
                               @RequestParam MultipartFile attendExcel) throws Exception {
@@ -52,8 +60,15 @@ public class AttendanceController {
             model.addAttribute("errorInfo", "未上传打卡表或者考勤表");
             return "unclock";
         }
-        File result = attendService.processExcel(unclockExcel.getInputStream(), attendExcel.getInputStream());
-        model.addAttribute("result", result);
+        //File result = attendService.processExcel(unclockExcel.getInputStream(), attendExcel.getInputStream());
+        //model.addAttribute("result", result);
+        return "result";
+    }
+
+
+    @GetMapping(value = "/download")
+    public String down(Model model) throws Exception {
+        model.addAttribute("result", null);
         return "result";
     }
 }

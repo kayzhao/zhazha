@@ -1,23 +1,20 @@
 package cn.kay.zhazha.utils;
 
-import cn.afterturn.easypoi.util.PoiCellUtil;
 import cn.kay.zhazha.domain.UnClock;
-import cn.kay.zhazha.domain.UnClockHtml;
-import org.apache.poi.hssf.usermodel.HSSFCell;
+import cn.kay.zhazha.domain.Fingerprint;
+import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.sl.usermodel.Sheet;
+import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.RichTextString;
 import org.apache.poi.ss.util.CellRangeAddress;
-import org.junit.Test;
-import org.springframework.web.multipart.MultipartFile;
 
-import javax.annotation.Resource;
-import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -30,17 +27,17 @@ import static cn.afterturn.easypoi.util.PoiCellUtil.getCellValue;
  * @create: 2018/8/23
  */
 public class ExcelUtils {
-    // 读取到列表
-
     /**
+     * 读取未打卡申请表
+     *
      * @param file
      * @return
      * @throws Exception
      */
-    public static Map readUnClockExcel(InputStream file) throws Exception {
+    public static Map readUnClockExcel(InputStream file, Integer year, Integer month) throws Exception {
         // 读取 excel 文件，获得excel 文档对象
         HSSFWorkbook book = new HSSFWorkbook(file);
-        Map<String, UnClock> map = new HashMap<>();
+        Map<String, Integer> map = new HashMap<>();
         // 获取到第一个表格
         HSSFSheet sheet = book.getSheetAt(0);
         /**
@@ -54,22 +51,23 @@ public class ExcelUtils {
             String name = row.getCell(1).getStringCellValue(); // 第二列
             String duty = row.getCell(2).getStringCellValue();
             String reason = row.getCell(3).getStringCellValue();
-            Date date = getDate(row.getCell(4).getStringCellValue()); // 第五列，数字类型需要强转
+            String date = row.getCell(4).getStringCellValue(); // 第五列，数字类型需要强转
             String type = row.getCell(5).getStringCellValue();
-            UnClock attendance = new UnClock(depart, name, duty, reason, date, type);
-            String key = depart + name + type + date.toString();
-            map.put(key, attendance);
+            String key = depart + "," + name + "," + type + "," + date;
+            map.put(key, 1);
         }
         return map;
     }
 
     /**
+     * 读取指纹打卡
+     *
      * @param file
      * @return
      * @throws Exception
      */
 
-    public static Map readUnClockHtml(InputStream file) throws Exception {
+    public static Map readFingerprint(InputStream file, Integer year, Integer month) throws Exception {
         // 读取 excel 文件，获得excel 文档对象
         HSSFWorkbook book = new HSSFWorkbook(file);
         Map<String, UnClock> map = new HashMap<>();
@@ -80,7 +78,7 @@ public class ExcelUtils {
          **/
         for (int i = 1; i < sheet.getLastRowNum() + 1; ) {
             int iPlusNum = 0;
-            UnClockHtml unClock = new UnClockHtml();
+            Fingerprint unClock = new Fingerprint();
             // 获取表格的第i行
             HSSFRow row = sheet.getRow(i);
             String first = row.getCell(0).getStringCellValue().trim();
@@ -90,7 +88,6 @@ public class ExcelUtils {
                 unClock.setId(info[0].split(":")[1]);
                 unClock.setName(info[1].split(":")[1]);
                 unClock.setDept(info[2].split(":").length > 1 ? info[2].split(":")[1] : "");
-
 
                 HSSFRow dateRow = sheet.getRow(i + 1);
                 HSSFRow clockRow = sheet.getRow(i + 2);
@@ -108,6 +105,66 @@ public class ExcelUtils {
         return map;
     }
 
+
+    /**
+     * 读取每月的考勤汇总表
+     *
+     * @param file
+     * @return
+     * @throws Exception
+     */
+    public static HSSFWorkbook countExcel(Map clockMap, InputStream file, Integer year, Integer month) throws Exception {
+        // 读取 excel 文件，获得excel 文档对象
+        HSSFWorkbook book = new HSSFWorkbook(file);
+        Map<String, UnClock> map = new HashMap<>();
+        // 获取到第一个表格
+        HSSFSheet sheet = book.getSheetAt(0);
+        List<RichTextString> list = getClockType(sheet.getRow(1));
+
+        //生成单元格样式
+        HSSFCellStyle style = book.createCellStyle();
+        //设置背景颜色
+        style.setFillForegroundColor(HSSFColor.YELLOW.index);
+
+        for (int i = 4; i < sheet.getLastRowNum() + 1; i++) {
+            // 获取表格的第i行
+            HSSFRow row = sheet.getRow(i);
+            String depart = "";
+            String name = "";
+            if (isMergedRegion(sheet, i, 1) != -1) {
+                depart = getMergedRegionValue(sheet, i, 1);
+            }
+            if (isMergedRegion(sheet, i, 2) != -1) {
+                name = getMergedRegionValue(sheet, i, 1);
+            }
+            /*String depart = row.getCell(1).getStringCellValue();
+            String name = row.getCell(2).getStringCellValue();*/
+            String type = row.getCell(3).getStringCellValue();
+            int all = TimeUtils.getDaysByYearMonth(year, month);
+            for (int col = 1; col <= all; col++) {
+                /*String day = row.getCell(col+4).getStringCellValue();*/
+                String date = String.format("%4d-%2d-%2d", year, month, col);
+                String key = depart + "," + name + "," + type + "," + date;
+                if (clockMap.containsKey(key)) {
+                    row.getCell(col + 4).setCellValue(list.get(0));//✔
+                    row.getCell(col + 4).setCellStyle(style);//黄色
+                }
+            }
+        }
+
+        return book;
+    }
+
+    public static List<RichTextString> getClockType(HSSFRow row) throws Exception {
+        // 读取 excel 文件，获得excel 文档对象
+        List<RichTextString> list = new ArrayList<>();
+        int colNum = row.getPhysicalNumberOfCells();
+        for (int i = 0; i < colNum; i++) {
+            list.add(row.getCell(i).getRichStringCellValue());
+        }
+
+        return list;
+    }
 
     /**
      * 判断指定的单元格是否是合并单元格
@@ -143,7 +200,7 @@ public class ExcelUtils {
      * @param column
      * @return
      */
-    public String getMergedRegionValue(HSSFSheet sheet, int row, int column) {
+    public static String getMergedRegionValue(HSSFSheet sheet, int row, int column) {
         int sheetMergeCount = sheet.getNumMergedRegions();
 
         for (int i = 0; i < sheetMergeCount; i++) {
@@ -192,13 +249,19 @@ public class ExcelUtils {
         ExcelUtil.getInstance().exportObj2ExcelByTemplate(map, "classpath:web-info-template.xls",
                 new FileOutputStream("D:/out22.xls"), list, WebDto.class, true);
     }*/
-    private static Date getDate(String date) throws Exception {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-mm-dd");
-        return sdf.parse(date);
+
+    /**
+     * @param date
+     * @return
+     * @throws Exception
+     */
+    private static String getDate(Date date) throws Exception {
+        return DateFormat.getDateInstance(DateFormat.DEFAULT).format(date);
     }
 
-
     public static void main(String[] args) throws Exception {
-        ExcelUtils.readUnClockHtml(new FileInputStream("/develop/code/kayzhao/shaoshuang/data.xls"));
+        Map map = ExcelUtils.readUnClockExcel(new FileInputStream("/develop/code/kayzhao/shaoshuang/unclock.xls"), 2018, 8);
+        HSSFWorkbook hssfWorkbook = ExcelUtils.countExcel(map, new FileInputStream("/develop/code/kayzhao/shaoshuang/08all.xls"), 2018, 8);
+        hssfWorkbook.write(new FileOutputStream("/develop/code/kayzhao/shaoshuang/08all_other.xls"));
     }
 }

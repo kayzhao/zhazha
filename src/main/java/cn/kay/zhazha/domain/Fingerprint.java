@@ -8,7 +8,7 @@ import java.util.Date;
 @AllArgsConstructor
 @Getter
 @Setter
-public class UnClockHtml {
+public class Fingerprint {
     private String id;
     private String dept;
     private String name;

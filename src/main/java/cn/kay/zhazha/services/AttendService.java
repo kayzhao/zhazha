@@ -12,5 +12,5 @@ public interface AttendService {
 
     public String processFingerprint(InputStream f1, InputStream f2, Integer year, Integer month) throws Exception;
 
-    public ResponseEntity<FileSystemResource> export(File file, String type);
+    public ResponseEntity<FileSystemResource> export(InputStream inputStream, String type) throws Exception;
 }

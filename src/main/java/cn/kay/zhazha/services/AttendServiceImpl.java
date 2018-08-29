@@ -2,6 +2,7 @@ package cn.kay.zhazha.services;
 
 import cn.kay.zhazha.domain.UnClock;
 import cn.kay.zhazha.utils.ExcelUtils;
+import org.apache.commons.io.FileUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
@@ -37,10 +38,12 @@ public class AttendServiceImpl implements AttendService {
     }
 
     @Override
-    public ResponseEntity<FileSystemResource> export(File file, String type) {
-        if (file == null || type == null) {
+    public ResponseEntity<FileSystemResource> export(InputStream inputStream, String type) throws Exception {
+        if (inputStream == null || type == null) {
             return null;
         }
+        File file = File.createTempFile(System.currentTimeMillis() + "", ".xls");
+        FileUtils.copyInputStreamToFile(inputStream, file);
         HttpHeaders headers = new HttpHeaders();
         headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
         headers.add("Content-Disposition", "attachment; filename=" + System.currentTimeMillis() + ".xls");

@@ -19,29 +19,41 @@
                 <hr>
                 <div class="mt-2">
                     未打卡表格预处理
-                    <ol>
-                        <li>确认 E列 没有空日期</li>
-                    </ol>
+                    <ul>
+                        <li>确认E列（日期列）没有空日期（样表黄色标记的列）</li>
+                        <li>
+                            预处理后的样表如：
+                            <a href="/download?type=localUnclock" target="_blank">样表</a>
+                        </li>
+                    </ul>
                 </div>
                 <hr>
                 <div class="mt-2">
                     单月份考勤表格预处理
-                    <ol>
+                    <ul>
                         <li>总表中导出需要统计的月份，复制到新建的Excel中，如：2018年08月
                             <!--<img src="../../static/images/all.jpg" width="400"
                                  th:src="@{/images/pre.jpg}"/>-->
                         </li>
                         <li>
-                            拆分A-C列合并的单元格，并且拆分后每个单元格有正确的值
+                            拆分A-C列（序号、部门、姓名，样表黄色标记的列）合并的单元格，并且拆分后每个单元格有正确的值
                             <a href="https://jingyan.baidu.com/article/fea4511a1dcb4ff7ba912543.html" target="_blank">参考指导</a>
                         </li>
                         <li>
-                            利用格式刷，去除文字的格式，调整文字方向，调整后的效果下载样表：
+                            利用格式刷，去除文字的格式，调整文字方向，预处理后的样表如：
                             <a href="/download?type=local" target="_blank">样表</a>
                             <!--<img src="../../static/images/post.jpg" width="400"
                                  th:src="@{/images/post.jpg}"/></li>-->
                         </li>
-                    </ol>
+                        <li>
+                            图示（样表第一行不要动）
+                            <img src="../../static/images/all.jpg" th:src="@{/images/pre.jpg}"
+                                 class="img-responsive center-block"/>
+
+                            <img src="../../static/images/post.jpg" th:src="@{/images/post.jpg}"
+                                 class="img-responsive center-block"/>
+                        </li>
+                    </ul>
                 </div>
                 <hr>
                 <div class="mt-2">

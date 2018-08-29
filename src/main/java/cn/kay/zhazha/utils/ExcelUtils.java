@@ -268,7 +268,7 @@ public class ExcelUtils {
         // 生成的文件存放位置
         // list 表格数据
         // list 集合泛型的类型
-        ExcelUtil.getInstance().exportObj2ExcelByTemplate(map, "classpath:web-info-template.xls",
+        ExcelUtil.getInstance().exportObj2ExcelByTemplate(map, "classpath:web-info-month.xls",
                 new FileOutputStream("D:/out22.xls"), list, WebDto.class, true);
     }*/
 

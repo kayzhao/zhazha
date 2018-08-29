@@ -76,12 +76,11 @@ public class AttendanceController {
             return null;
         }
         if ("local".equals(type)) {
-            File file = new ClassPathResource("static/file/template.xls").getFile();
-            return attendService.export(file, type);
+            return attendService.export(new ClassPathResource("static/file/month.xls").getInputStream(), type);
+        } else if ("localUnclock".equals(type)) {
+            return attendService.export(new ClassPathResource("static/file/unclock.xls").getInputStream(), type);
         } else {
-            ClassPathResource resource = new ClassPathResource("result/result.xls");
-            return attendService.export(resource.getFile(), type);
+            return attendService.export(new ClassPathResource("result/result.xls").getInputStream(), type);
         }
-        //return null;
     }
 }

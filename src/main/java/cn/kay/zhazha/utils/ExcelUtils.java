@@ -2,10 +2,7 @@ package cn.kay.zhazha.utils;
 
 import cn.kay.zhazha.domain.UnClock;
 import cn.kay.zhazha.domain.Fingerprint;
-import org.apache.poi.hssf.usermodel.HSSFCellStyle;
-import org.apache.poi.hssf.usermodel.HSSFRow;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.RichTextString;
@@ -53,7 +50,11 @@ public class ExcelUtils {
             String reason = row.getCell(3).getStringCellValue();
             String date = row.getCell(4).getStringCellValue(); // 第五列，数字类型需要强转
             String type = row.getCell(5).getStringCellValue();
-            String key = depart + "," + name + "," + type + "," + date;
+            String key = (name + "," + type + "," + date).
+                    replaceAll("[\\s\\u00A0]+", " ").
+                    replaceAll("\\s+", "").
+                    replaceAll("上班", "上午").replaceAll("下班", "下午");
+            //String key = depart + "," + name + "," + type + "," + date;
             map.put(key, 1);
         }
         return map;
@@ -83,7 +84,7 @@ public class ExcelUtils {
             HSSFRow row = sheet.getRow(i);
             String first = row.getCell(0).getStringCellValue().trim();
             if (first.equals("员工")) {
-                String two = row.getCell(1).getStringCellValue().trim().replaceAll("[\\s\\u00A0]+", " ");
+                String two = row.getCell(1).getStringCellValue().trim().replaceAll("[\\s\\u00A0]+", "").replaceAll("\\s+", "");
                 String[] info = two.split("\\s+");
                 unClock.setId(info[0].split(":")[1]);
                 unClock.setName(info[1].split(":")[1]);
@@ -116,42 +117,56 @@ public class ExcelUtils {
     public static HSSFWorkbook countExcel(Map clockMap, InputStream file, Integer year, Integer month) throws Exception {
         // 读取 excel 文件，获得excel 文档对象
         HSSFWorkbook book = new HSSFWorkbook(file);
-        Map<String, UnClock> map = new HashMap<>();
+        //HSSFWorkbook result = new HSSFWorkbook(file);
+
         // 获取到第一个表格
         HSSFSheet sheet = book.getSheetAt(0);
-        List<RichTextString> list = getClockType(sheet.getRow(1));
+        HSSFSheet result = book.createSheet("统计结果");
+        //HSSFSheet resultSheet = book.getSheetAt(0);
+        List<RichTextString> list = getClockType(sheet.getRow(0));
 
         //生成单元格样式
         HSSFCellStyle style = book.createCellStyle();
         //设置背景颜色
         style.setFillForegroundColor(HSSFColor.YELLOW.index);
 
-        for (int i = 4; i < sheet.getLastRowNum() + 1; i++) {
+
+        for (int i = 3; i < sheet.getLastRowNum(); i++) {
+            HSSFRow resultRow = result.createRow(i);
             // 获取表格的第i行
             HSSFRow row = sheet.getRow(i);
-            String depart = "";
+            /*String depart = "";
             String name = "";
             if (isMergedRegion(sheet, i, 1) != -1) {
                 depart = getMergedRegionValue(sheet, i, 1);
             }
             if (isMergedRegion(sheet, i, 2) != -1) {
                 name = getMergedRegionValue(sheet, i, 1);
-            }
-            /*String depart = row.getCell(1).getStringCellValue();
-            String name = row.getCell(2).getStringCellValue();*/
+            }*/
+            String depart = row.getCell(1).getStringCellValue();
+            String name = row.getCell(2).getStringCellValue();
             String type = row.getCell(3).getStringCellValue();
+            resultRow.createCell(1).setCellValue(row.getCell(1).getStringCellValue());
+            resultRow.createCell(2).setCellValue(row.getCell(2).getStringCellValue());
+            resultRow.createCell(3).setCellValue(row.getCell(3).getStringCellValue());
+
             int all = TimeUtils.getDaysByYearMonth(year, month);
-            for (int col = 1; col <= all; col++) {
+            for (int col = 0; col < all; col++) {
                 /*String day = row.getCell(col+4).getStringCellValue();*/
-                String date = String.format("%4d-%2d-%2d", year, month, col);
-                String key = depart + "," + name + "," + type + "," + date;
+                String date = String.format("%04d-%02d-%02d", year, month, col);
+                //String key = depart + "," + name + "," + type + "," + date;
+                String key = (name + "," + type + "," + date).replaceAll("[\\s\\u00A0]+", " ").replaceAll("\\s+", "");
                 if (clockMap.containsKey(key)) {
-                    row.getCell(col + 4).setCellValue(list.get(0));//✔
-                    row.getCell(col + 4).setCellStyle(style);//黄色
+                    if (row.getCell(col + 4) == null) {
+                        /*row.createCell(col + 4).setCellValue(list.get(0));//✔
+                        row.createCell(col + 4).setCellStyle(style);//黄色*/
+                        HSSFCell cell = resultRow.createCell(col + 4);
+                        cell.setCellValue(list.get(0));//✔
+                        cell.setCellStyle(style);//黄色
+                    }
                 }
             }
         }
-
         return book;
     }
 
@@ -261,7 +276,7 @@ public class ExcelUtils {
 
     public static void main(String[] args) throws Exception {
         Map map = ExcelUtils.readUnClockExcel(new FileInputStream("/develop/code/kayzhao/shaoshuang/unclock.xls"), 2018, 8);
-        HSSFWorkbook hssfWorkbook = ExcelUtils.countExcel(map, new FileInputStream("/develop/code/kayzhao/shaoshuang/08all.xls"), 2018, 8);
+        HSSFWorkbook hssfWorkbook = ExcelUtils.countExcel(map, new FileInputStream("/develop/code/kayzhao/shaoshuang/08month.xls"), 2018, 8);
         hssfWorkbook.write(new FileOutputStream("/develop/code/kayzhao/shaoshuang/08all_other.xls"));
     }
 }

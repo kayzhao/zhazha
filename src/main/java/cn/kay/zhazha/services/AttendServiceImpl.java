@@ -46,6 +46,9 @@ public class AttendServiceImpl implements AttendService {
         if (inputStream == null || type == null) {
             return null;
         }
+        //清理/tmp/目录的空间
+        FileUtils.cleanDirectory(FileUtils.getTempDirectory());
+        //生成此次下载的tmp文件
         File file = File.createTempFile(System.currentTimeMillis() + "", ".xls");
         FileUtils.copyInputStreamToFile(inputStream, file);
         HttpHeaders headers = new HttpHeaders();

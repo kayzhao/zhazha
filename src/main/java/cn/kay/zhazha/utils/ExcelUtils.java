@@ -135,8 +135,10 @@ public class ExcelUtils {
             int all = TimeUtils.getDaysByYearMonth(year, month);
             for (int col = 0; col < all; col++) {
                 //是复合单元格就跳过，入职考勤忽略
-                if (isMergedRegion(sheet, i, col)) continue;
-                String date = String.format("%04d-%02d-%02d", year, month, col);
+                if (isMergedRegion(sheet, i, col)) {
+                    continue;
+                }
+                String date = String.format("%04d-%02d-%02d", year, month, col + 1);
                 String key = (name + "," + type + "," + date).
                         replaceAll("[\\s\\u00A0]+", " "). //替换160字符
                         replaceAll("\\s+", "");  //替换空格
@@ -160,7 +162,6 @@ public class ExcelUtils {
         for (int i = 0; i < colNum; i++) {
             list.add(row.getCell(i).getRichStringCellValue());
         }
-
         return list;
     }
 

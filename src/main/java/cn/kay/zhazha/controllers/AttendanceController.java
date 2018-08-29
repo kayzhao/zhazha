@@ -4,6 +4,10 @@ import cn.kay.zhazha.domain.RequestObject;
 import cn.kay.zhazha.services.AttendService;
 import cn.kay.zhazha.utils.ExcelUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -40,9 +44,9 @@ public class AttendanceController {
             year = Calendar.YEAR;
         if (month == null)
             month = Calendar.MONTH;
-        File result = attendService.processExcel(unclockExcel.getInputStream(), attendExcel.getInputStream(), year, month);
-        model.addAttribute("result", result);
-        return "result";
+        String result = attendService.processExcel(unclockExcel.getInputStream(), attendExcel.getInputStream(), year, month);
+        model.addAttribute("file", result);
+        return "unclock";
     }
 
     @GetMapping("/fingerprint")
@@ -67,8 +71,17 @@ public class AttendanceController {
 
 
     @GetMapping(value = "/download")
-    public String down(Model model) throws Exception {
-        model.addAttribute("result", null);
-        return "result";
+    public ResponseEntity<FileSystemResource> down(Model model, @RequestParam String type) throws Exception {
+        if (type == null) {
+            return null;
+        }
+        if ("local".equals(type)) {
+            File file = new ClassPathResource("static/file/template.xls").getFile();
+            return attendService.export(file, type);
+        } else {
+            ClassPathResource resource = new ClassPathResource("result/result.xls");
+            return attendService.export(resource.getFile(), type);
+        }
+        //return null;
     }
 }

@@ -12,13 +12,46 @@
     <div>
         <div class="jumbotron">
             <div class=" row text-left ">
-                <div class="">
-                    <span class="glyphicon glyphicon-book"></span> 操作指导：
+                <div class="mt-2">
+                    <span class="glyphicon glyphicon-book"></span>
+                    操作指导：目前只针对单个月份进行数据处理，并且提交时候设置年和月
+                </div>
+                <hr>
+                <div class="mt-2">
+                    未打卡表格预处理
+                    <ol>
+                        <li>确认 E列 没有空日期</li>
+                    </ol>
+                </div>
+                <hr>
+                <div class="mt-2">
+                    单月份考勤表格预处理
+                    <ol>
+                        <li>总表中导出需要统计的月份，复制到新建的Excel中，如：2018年08月
+                            <!--<img src="../../static/images/all.jpg" width="400"
+                                 th:src="@{/images/pre.jpg}"/>-->
+                        </li>
+                        <li>
+                            拆分A-C列合并的单元格，并且拆分后每个单元格有正确的值
+                            <a href="https://jingyan.baidu.com/article/fea4511a1dcb4ff7ba912543.html" target="_blank">参考指导</a>
+                        </li>
+                        <li>
+                            利用格式刷，去除文字的格式，调整文字方向，调整后的效果下载样表：
+                            <a href="/download?type=local" target="_blank">样表</a>
+                            <!--<img src="../../static/images/post.jpg" width="400"
+                                 th:src="@{/images/post.jpg}"/></li>-->
+                        </li>
+                    </ol>
+                </div>
+                <hr>
+                <div class="mt-2">
+                    使用指导：
                     <ol>
                         <li>上传未打卡表格</li>
                         <li>上传考勤表格</li>
                         <li>点击提交</li>
                     </ol>
+
                 </div>
             </div>
         </div>
@@ -51,8 +84,11 @@
             </div>
         </form>
     </div>
-
+    <!--<hr class="clear clearfix  mt-5">-->
     <div class="text-center text-danger" th:text="${errorInfo}"><!--${errorInfo}--></div>
+    <div class="text-left">
+        转换结果:<a target="_blank" href="/download?type=result" th:text="${file}"></a>
+    </div>
 </div>
 
 </body>

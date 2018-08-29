@@ -51,8 +51,8 @@ public class ExcelUtils {
             String date = row.getCell(4).getStringCellValue(); // 第五列，数字类型需要强转
             String type = row.getCell(5).getStringCellValue();
             String key = (name + "," + type + "," + date).
-                    replaceAll("[\\s\\u00A0]+", " ").
-                    replaceAll("\\s+", "").
+                    replaceAll("[\\s\\u00A0]+", " "). //替换160字符
+                    replaceAll("\\s+", "").  //替换空格
                     replaceAll("上班", "上午").replaceAll("下班", "下午");
             //String key = depart + "," + name + "," + type + "," + date;
             map.put(key, 1);
@@ -92,7 +92,7 @@ public class ExcelUtils {
 
                 HSSFRow dateRow = sheet.getRow(i + 1);
                 HSSFRow clockRow = sheet.getRow(i + 2);
-                int rowNum = isMergedRegion(sheet, i + 2, 0);
+                int rowNum = isMergedRegionRowNum(sheet, i + 2, 0);
                 //是合并单元格
                 if (rowNum != -1) {
 
@@ -117,56 +117,39 @@ public class ExcelUtils {
     public static HSSFWorkbook countExcel(Map clockMap, InputStream file, Integer year, Integer month) throws Exception {
         // 读取 excel 文件，获得excel 文档对象
         HSSFWorkbook book = new HSSFWorkbook(file);
-        //HSSFWorkbook result = new HSSFWorkbook(file);
-
         // 获取到第一个表格
         HSSFSheet sheet = book.getSheetAt(0);
-        HSSFSheet result = book.createSheet("统计结果");
-        //HSSFSheet resultSheet = book.getSheetAt(0);
         List<RichTextString> list = getClockType(sheet.getRow(0));
-
         //生成单元格样式
         HSSFCellStyle style = book.createCellStyle();
         //设置背景颜色
         style.setFillForegroundColor(HSSFColor.YELLOW.index);
-
+        style.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
 
         for (int i = 3; i < sheet.getLastRowNum(); i++) {
-            HSSFRow resultRow = result.createRow(i);
             // 获取表格的第i行
             HSSFRow row = sheet.getRow(i);
-            /*String depart = "";
-            String name = "";
-            if (isMergedRegion(sheet, i, 1) != -1) {
-                depart = getMergedRegionValue(sheet, i, 1);
-            }
-            if (isMergedRegion(sheet, i, 2) != -1) {
-                name = getMergedRegionValue(sheet, i, 1);
-            }*/
             String depart = row.getCell(1).getStringCellValue();
             String name = row.getCell(2).getStringCellValue();
             String type = row.getCell(3).getStringCellValue();
-            resultRow.createCell(1).setCellValue(row.getCell(1).getStringCellValue());
-            resultRow.createCell(2).setCellValue(row.getCell(2).getStringCellValue());
-            resultRow.createCell(3).setCellValue(row.getCell(3).getStringCellValue());
-
             int all = TimeUtils.getDaysByYearMonth(year, month);
             for (int col = 0; col < all; col++) {
-                /*String day = row.getCell(col+4).getStringCellValue();*/
+                //是复合单元格就跳过，入职考勤忽略
+                if (isMergedRegion(sheet, i, col)) continue;
                 String date = String.format("%04d-%02d-%02d", year, month, col);
-                //String key = depart + "," + name + "," + type + "," + date;
-                String key = (name + "," + type + "," + date).replaceAll("[\\s\\u00A0]+", " ").replaceAll("\\s+", "");
+                String key = (name + "," + type + "," + date).
+                        replaceAll("[\\s\\u00A0]+", " "). //替换160字符
+                        replaceAll("\\s+", "");  //替换空格
                 if (clockMap.containsKey(key)) {
                     if (row.getCell(col + 4) == null) {
-                        /*row.createCell(col + 4).setCellValue(list.get(0));//✔
-                        row.createCell(col + 4).setCellStyle(style);//黄色*/
-                        HSSFCell cell = resultRow.createCell(col + 4);
+                        HSSFCell cell = row.createCell(col + 4);
                         cell.setCellValue(list.get(0));//✔
                         cell.setCellStyle(style);//黄色
                     }
                 }
             }
         }
+        book.setSheetName(0, "统计结果");
         return book;
     }
 
@@ -182,14 +165,14 @@ public class ExcelUtils {
     }
 
     /**
-     * 判断指定的单元格是否是合并单元格
+     * 判断指定的单元格是否是合并单元格,并返回行数
      *
      * @param sheet
      * @param row    行下标
      * @param column 列下标
      * @return 行数
      */
-    private static int isMergedRegion(HSSFSheet sheet, int row, int column) {
+    private static int isMergedRegionRowNum(HSSFSheet sheet, int row, int column) {
         int sheetMergeCount = sheet.getNumMergedRegions();
         for (int i = 0; i < sheetMergeCount; i++) {
             CellRangeAddress range = sheet.getMergedRegion(i);
@@ -206,6 +189,30 @@ public class ExcelUtils {
         return -1;
     }
 
+    /**
+     * 判断指定的单元格是否是合并单元格
+     *
+     * @param sheet
+     * @param row    行下标
+     * @param column 列下标
+     * @return 行数
+     */
+    private static boolean isMergedRegion(HSSFSheet sheet, int row, int column) {
+        int sheetMergeCount = sheet.getNumMergedRegions();
+        for (int i = 0; i < sheetMergeCount; i++) {
+            CellRangeAddress range = sheet.getMergedRegion(i);
+            int firstColumn = range.getFirstColumn();
+            int lastColumn = range.getLastColumn();
+            int firstRow = range.getFirstRow();
+            int lastRow = range.getLastRow();
+            if (row >= firstRow && row <= lastRow) {
+                if (column >= firstColumn && column <= lastColumn) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 
     /**
      * 获取合并单元格的值

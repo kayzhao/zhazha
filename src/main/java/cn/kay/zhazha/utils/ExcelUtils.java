@@ -143,11 +143,11 @@ public class ExcelUtils {
                         replaceAll("[\\s\\u00A0]+", " "). //替换160字符
                         replaceAll("\\s+", "");  //替换空格
                 if (clockMap.containsKey(key)) {
-                    if (row.getCell(col + 4) == null) {
-                        HSSFCell cell = row.createCell(col + 4);
-                        cell.setCellValue(list.get(0));//✔
-                        cell.setCellStyle(style);//黄色
-                    }
+                    //if (row.getCell(col + 4) == null || row.getCell(col + 4).getStringCellValue().length() == 0) {
+                    HSSFCell cell = row.createCell(col + 4);
+                    cell.setCellValue(list.get(0));//✔
+                    cell.setCellStyle(style);//黄色
+                    //}
                 }
             }
         }

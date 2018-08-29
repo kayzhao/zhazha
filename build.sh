@@ -19,4 +19,4 @@ mvn clean install -DskipTests
 
 echo start application...
 cd target
-nohup java -jar wifetool-0.0.1.jar &
+nohup java -Djava.io.tmpdir=/root/kayzhao/tmpwife/ -jar wifetool-0.0.1.jar &

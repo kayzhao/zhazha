@@ -23,11 +23,15 @@ public class AttendServiceImpl implements AttendService {
     public String processExcel(InputStream f1, InputStream f2, Integer year, Integer month) throws Exception {
         Map<String, UnClock> unClockMap = ExcelUtils.readUnClockExcel(f1, year, month);
         HSSFWorkbook hssfWorkbook = ExcelUtils.countExcel(unClockMap, f2, year, month);
-        String fileName = "result.xls";
+        /*String fileName = "result.xls";
         ClassPathResource resource = new ClassPathResource("result/" + fileName);
         hssfWorkbook.write(resource.getFile());
         hssfWorkbook.close();
-        return fileName;
+        return fileName;*/
+        File file = File.createTempFile(System.currentTimeMillis() + "", ".xls");
+        hssfWorkbook.write(file);
+        hssfWorkbook.close();
+        return file.getAbsolutePath();
     }
 
     @Override

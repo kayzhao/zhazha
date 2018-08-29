@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -46,6 +47,7 @@ public class AttendanceController {
             month = Calendar.MONTH;
         String result = attendService.processExcel(unclockExcel.getInputStream(), attendExcel.getInputStream(), year, month);
         model.addAttribute("file", result);
+        model.addAttribute("alias", "统计结果");
         return "unclock";
     }
 
@@ -71,7 +73,7 @@ public class AttendanceController {
 
 
     @GetMapping(value = "/download")
-    public ResponseEntity<FileSystemResource> down(Model model, @RequestParam String type) throws Exception {
+    public ResponseEntity<FileSystemResource> down(Model model, @RequestParam String type, @RequestParam(required = false) String filePath) throws Exception {
         if (type == null) {
             return null;
         }
@@ -80,7 +82,7 @@ public class AttendanceController {
         } else if ("localUnclock".equals(type)) {
             return attendService.export(new ClassPathResource("static/file/unclock.xls").getInputStream(), type);
         } else {
-            return attendService.export(new ClassPathResource("result/result.xls").getInputStream(), type);
+            return attendService.export(new FileInputStream(filePath), type);
         }
     }
 }

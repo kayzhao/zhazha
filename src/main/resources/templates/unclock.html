@@ -104,7 +104,7 @@
     </div>
 
     <div class="clear clearfix  mt-5  text-center">
-        转换结果:<a target="_blank" href="/download?type=result" th:text="${file}"></a>
+        转换结果:<a target="_blank" th:href="@{'/download?type=result&filePath='+${file}}" th:text="${alias}"></a>
     </div>
 </div>
 

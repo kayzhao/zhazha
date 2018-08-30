@@ -29,6 +29,7 @@ public class AttendServiceImpl implements AttendService {
         hssfWorkbook.close();
         return fileName;*/
         File file = File.createTempFile(System.currentTimeMillis() + "", ".xls");
+        file.deleteOnExit();
         hssfWorkbook.write(file);
         hssfWorkbook.close();
         return file.getAbsolutePath();
@@ -51,6 +52,7 @@ public class AttendServiceImpl implements AttendService {
         //System.out.println(FileUtils.getTempDirectory());
         //生成此次下载的tmp文件
         File file = File.createTempFile(System.currentTimeMillis() + "", ".xls");
+        file.deleteOnExit();
         FileUtils.copyInputStreamToFile(inputStream, file);
         HttpHeaders headers = new HttpHeaders();
         headers.add("Cache-Control", "no-cache, no-store, must-revalidate");

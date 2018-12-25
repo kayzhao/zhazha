@@ -11,9 +11,9 @@ in **zhazha** folder,then type commands as fllows:
 2. chmod u+x build.sh
 3. ./build.sh
 
-## error
+## Error
 
-### mvn error
+### MVN error
 JDK version must be 1.8+
 
 ### Unable to create tempDir

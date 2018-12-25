@@ -10,3 +10,11 @@ in **zhazha** folder,then type commands as fllows:
 1. git pull
 2. chmod u+x build.sh
 3. ./build.sh
+
+## error
+
+### mvn error
+JDK version must be 1.8+
+
+### start error
+mkdir /root/kayzhao/tmpwife/

@@ -16,5 +16,5 @@ in **zhazha** folder,then type commands as fllows:
 ### mvn error
 JDK version must be 1.8+
 
-### start error
-mkdir -p /root/kayzhao/tmpwife/
+### Unable to create tempDir
+mkdir -p /root/kayzhao/tmpwife/  (the tmp folder is show in nohup.out log)

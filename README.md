@@ -8,8 +8,7 @@ Web Tool Of My zhazha
 ## Deploy
 in **zhazha** folder,then type commands as fllows:
 1. git pull
-2. chmod u+x build.sh
-3. ./build.sh
+2. sudo bash -x build.sh
 
 ## Error
 

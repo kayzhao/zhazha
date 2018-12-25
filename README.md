@@ -17,4 +17,4 @@ in **zhazha** folder,then type commands as fllows:
 JDK version must be 1.8+
 
 ### start error
-mkdir /root/kayzhao/tmpwife/
+mkdir -p /root/kayzhao/tmpwife/
